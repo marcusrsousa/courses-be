@@ -1,2 +1,2 @@
-# courses-be
+# Courses API 
 simple courses API using Python

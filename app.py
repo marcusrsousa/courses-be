@@ -12,7 +12,9 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SQLALCHEMY_ECHO'] = True
 
 api = Api(app)
-CORS(app,resources={r"/*": {"origins": "*"}})
+CORS(app, origins="*", allow_headers=[
+    "Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+    supports_credentials=True)
 
 @app.before_first_request
 def create_tables():
