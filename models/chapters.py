@@ -1,21 +1,21 @@
 from datetime import datetime
+
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
 from dao import db,Base
 
-class CourseModel(Base):
-    __tablename__ = 'courses'
+class ChapterModel(Base):
+    __tablename__ = 'chapters'
     id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, ForeignKey('courses.id'))
     name = db.Column(db.String(200),unique=True)
-    description = db.Column(db.String(200))
-    teacher = db.Column(db.String(50))
     date = db.Column(db.DateTime)
-    chapters = relationship("ChapterModel")
+    lessons = relationship("LessonModel")
 
-    def __init__(self,name,description,teacher):
+    def __init__(self, course_id, name):
+        self.course_id = course_id
         self.name = name
-        self.description = description
-        self.teacher = teacher
         self.date = datetime.now()
 
     def add(self):
@@ -31,14 +31,12 @@ class CourseModel(Base):
         return cls.query.filter_by(name=name).first()
 
     @classmethod
-    def list(cls):
-        return cls.query.all()
+    def list(cls, course_id):
+        return cls.query.filter_by(course_id=course_id).all()
 
     def update(self, data):
         self.name = data['name']
-        self.description = data['description']
-        self.teacher = data['teacher']
-
+        
         db.session.flush()
         db.session.commit()
 

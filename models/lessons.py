@@ -1,21 +1,21 @@
-from datetime import datetime
-from sqlalchemy.orm import relationship
-
+from sqlalchemy import ForeignKey
 from dao import db,Base
+from datetime import datetime
 
-class CourseModel(Base):
-    __tablename__ = 'courses'
+class LessonModel(Base):
+    __tablename__ = 'lessons'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200),unique=True)
-    description = db.Column(db.String(200))
-    teacher = db.Column(db.String(50))
+    chapter_id = db.Column(db.Integer, ForeignKey('chapters.id'))
+    name = db.Column(db.String(50))
+    description = db.Column(db.String(4000))
+    video_link = db.Column(db.String(100))
     date = db.Column(db.DateTime)
-    chapters = relationship("ChapterModel")
 
-    def __init__(self,name,description,teacher):
+    def __init__(self, chapter_id, name, description, video_link):
+        self.chapter_id = chapter_id
         self.name = name
         self.description = description
-        self.teacher = teacher
+        self.video_link = video_link
         self.date = datetime.now()
 
     def add(self):
@@ -31,14 +31,14 @@ class CourseModel(Base):
         return cls.query.filter_by(name=name).first()
 
     @classmethod
-    def list(cls):
-        return cls.query.all()
+    def list(cls, chapter_id):
+        return cls.query.filter_by(chapter_id=chapter_id).all()
 
     def update(self, data):
         self.name = data['name']
         self.description = data['description']
-        self.teacher = data['teacher']
-
+        self.video_link = data['video_link']
+        
         db.session.flush()
         db.session.commit()
 

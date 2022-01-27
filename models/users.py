@@ -1,21 +1,19 @@
 from datetime import datetime
-from sqlalchemy.orm import relationship
 
 from dao import db,Base
 
-class CourseModel(Base):
-    __tablename__ = 'courses'
+class UserModel(Base):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200),unique=True)
-    description = db.Column(db.String(200))
-    teacher = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(50),unique=True)
+    password = db.Column(db.String(1000))
     date = db.Column(db.DateTime)
-    chapters = relationship("ChapterModel")
-
-    def __init__(self,name,description,teacher):
+    
+    def __init__(self,name,email,password):
         self.name = name
-        self.description = description
-        self.teacher = teacher
+        self.email = email
+        self.password = password
         self.date = datetime.now()
 
     def add(self):
@@ -27,8 +25,8 @@ class CourseModel(Base):
         return cls.query.filter_by(id=_id).first()
 
     @classmethod
-    def find_by_name(cls, name):
-        return cls.query.filter_by(name=name).first()
+    def find_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
 
     @classmethod
     def list(cls):
@@ -36,8 +34,8 @@ class CourseModel(Base):
 
     def update(self, data):
         self.name = data['name']
-        self.description = data['description']
-        self.teacher = data['teacher']
+        self.email = data['email']
+        self.password = data['password']
 
         db.session.flush()
         db.session.commit()
@@ -45,3 +43,9 @@ class CourseModel(Base):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    def as_dict(self):
+        return {
+            "name": self.name,
+            "email": self.email
+        }

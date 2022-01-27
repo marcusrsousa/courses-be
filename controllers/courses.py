@@ -1,12 +1,17 @@
+from flask import current_app as app
 from flask_restful import Resource, fields, marshal_with, reqparse
+
+import http_status
 from models.courses import CourseModel
+from controllers.chapters import resource_fields as chapter_fields
 
 resource_fields = {
-    'id':   fields.Integer,
+    'id':   fields.Integer(default=None),
     'name':   fields.String,
     'description':   fields.String,
     'teacher':   fields.String,
-    'date':    fields.DateTime(dt_format='iso8601')
+    'date':    fields.DateTime(dt_format='iso8601'),
+    'chapters': fields.List(fields.Nested(chapter_fields))
 }
 
 parser = reqparse.RequestParser()
@@ -30,25 +35,29 @@ class Course(Resource):
 
     @marshal_with(resource_fields)
     def get(self, id):
-        return CourseModel.find_by_id(id)
+        course = CourseModel.find_by_id(id)
+        if not course:
+            return http_status.NotFound()
+            
+        return course
 
     def put(self, id):
         data =  parser.parse_args()
         course = CourseModel.find_by_id(id)
         if not course:
-            return '', 404
+            return http_status.NotFound()
 
         course.update(data)       
 
-        return '', 202
+        return http_status.Accepted()
 
     def delete(self, id):
         course = CourseModel.find_by_id(id)
         if not course:
-            return '', 404
+            return http_status.NotFound()
         
         course.delete()
-        return '', 204
+        return http_status.NoContent()
 
 class Courses(Resource):
 
@@ -61,5 +70,4 @@ class Courses(Resource):
         data =  parser.parse_args()
         course = CourseModel(data['name'], data['description'], data['teacher'])
         course.add()
-
-        return course, 201
+        return http_status.Created(course)

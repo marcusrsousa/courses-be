@@ -3,4 +3,7 @@ Flask-RESTful
 Flask-Cors
 flask-sqlalchemy
 Flask-Session
+Flask-Migrate
 psycopg2
+pyjwt
+bcrypt
