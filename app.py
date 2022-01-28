@@ -1,7 +1,6 @@
 import json
 import jwt
 from flask import Flask, request
-from flask_cors import CORS
 from flask_restful import Api
 from flask_migrate import Migrate
 
@@ -20,7 +19,6 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = 'secret'
 
-# cors = CORS(app, resources={"*" : {"origins": "*"}})
 api = Api(app)
 
 
@@ -34,8 +32,6 @@ def validate_token():
     if not request.base_url.endswith('/login') and request.method != 'OPTIONS':
         token = request.headers.get('Authorization')
 
-        print('headers', request.method)
-        
         if not token:
             return http_status.Unauthorized()
         
@@ -52,8 +48,6 @@ def remove_none_fields(resp):
     """
     removes all None fields
     """
-
-    print('entrou no after')
 
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,authorization')
